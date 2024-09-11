@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Serie Temporal</title>
+    
+    <!-- Estilos de flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/northern_lights.css"> <!-- Tema Northern Lights -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        /*Global Container*/
+        .background_container {
+
+            /*Background*/
+            background-image: url('/static/background.jpg');    /* Ruta a tu imagen de fondo */
+            background-size: cover;         /* Ajusta la imagen para que cubra todo el fondo */
+            background-position: center;    /* Centra la imagen */
+            background-repeat: no-repeat;   /* Evita que la imagen se repita */
+            
+            /*Position*/
+            position: fixed;        
+            width: 100%;
+            height: 100%;
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+        }
+        
+        /* Growth Dashboard Title */
+        .container_global_title h1{
+
+            /*Position*/
+            position: absolute;     /* Absolute para que esté en relación con el body */
+            width: 320px;
+            height: 50px;
+            top: 20px;
+            left: 130px;
+            
+            /*Background*/
+            background-color: rgba(0, 0, 0, 0);         /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0);     /* Sin sombra */
+            border-radius: 8px;
+            margin: 0;                                    /* Elimina el margen por defecto del h1 */
+            
+            /*Fonts*/
+            font-family: "Segoe UI";
+            text-align: center;     /* Centra el texto dentro del contenedor */
+            font-size: 26pt;        /* Ajusta el tamaño de fuente si es necesario */
+            color: white;         /* Color del texto en el contenedor */
+        }
+        
+        /* Contenedor Boton de Filtro */
+        .container_global_filter {
+
+            /*Position*/
+            position: absolute;     /* Cambia a absolute para que esté en relación con el body */
+            width: 55px;
+            height: 55px;
+            top: 20px;
+            left: 520px;
+            
+            /*Background*/
+            background-image: url('/static/Filter_white.png');  /* Ruta a tu imagen de fondo */
+            background-size: contain;       /* Ajusta la imagen para que cubra todo el fondo */
+            background-position: center;    /* Centra la imagen */
+            background-repeat: no-repeat;   /* Evita que la imagen se repita */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white;   /* Color del texto en el contenedor */
+        }
+        
+        .container_filters_window{
+            position: relative;
+            width: 420px;
+            height: 200px;
+            top: 70px;
+            left: 220px;
+            display: none; /* Inicialmente oculto */
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            z-index: 1;
+        }
+        
+        /* MRR Title */
+        .container1_title h1{
+
+            /*Position*/
+            position: absolute;     /* Cambia a absolute para que esté en relación con el body */
+            width: 255px;
+            height: 50px;
+            top: 70px;
+            left: 130px;
+            
+            /*Background*/
+            background-color: rgba(0, 0, 0, 0);     /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            font-family: "Segoe UI";
+            font-size: 13pt;            /* Tamaño del valor aumentado */
+            color: #FFFFFF;
+            font-weight: bold;
+            text-align: left;
+            padding: 0px 0px 0px 0px;   /* Arriba Derecha Inferior Izquierdo*/
+        }
+        
+        /* MRR Subtitle */
+        .container1_title h2{
+
+            /*Position*/
+            position: absolute;     /* Cambia a absolute para que esté en relación con el body */
+            width: 255px;
+            height: 35px;
+            top: 95px;
+            left: 130px;
+            
+            /*Background*/
+            background-color: rgba(0, 0, 0, 0);     /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            border-radius: 8px;
+            padding: 0px 0px 0px 0px;                     /* Arriba Derecha Inferior Izquierdo*/
+            box-shadow: 0px 0px 15px rgba(0,0,0,0);     /* Sin sombra */
+            
+            /*Fonts*/
+            font-size: 12pt;            /* Tamaño del valor aumentado */
+            text-align: left;
+            color: #808080;
+            font-weight: normal;
+            font-family: "Segoe UI";
+        }
+        
+        /* MRR Growth Value Container */
+        .container1_value {
+
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 100px;
+            height: 50px;
+            top: 85px;
+            left: 385px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 15px 0px 0px 0px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+        
+        /* Title: MRR Growth Value */
+        .kpi_value_title_1 {
+
+            font-family: "Segoe UI";
+            font-size: 12px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #FFFFFF;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;    
+        }
+
+        /* Value: MRR Growth Value */
+        .kpi_value_value_1 {
+
+            font-family: "Segoe UI";
+            font-size: 18px; /* Tamaño del valor aumentado */
+            color: #808080;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        /* MRR Growth Percentage Container */
+        .container1_percentage {
+
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 100px;
+            height: 50px;
+            top: 85px;
+            left: 485px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            border-radius: 0px 15px 0px 0px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+        
+        /* Title: MRR Growth Percentage */
+        .kpi_percentage_title_1 {
+
+            font-family: "Segoe UI";
+            font-size: 12px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #FFFFFF;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+
+        /* Value: MRR Growth Percentage */
+        .kpi_percentage_value_1 {
+
+            font-family: "Segoe UI";
+            font-size: 18px; /* Tamaño del valor aumentado */
+            color: #00FF40;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        /* MRR Background Plot Container */
+        .container1 {
+
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 455px;
+            height: 200px;
+            top: 135px;
+            left: 130px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px 0px 8px 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+
+        /* MRR Plot Container */
+        .content1 {
+
+            position: relative; /* Relativo al contenedor padre */
+            width: 100%;
+            height: 100%;
+            top: -20px; /* Ajusta verticalmente el contenido */
+            right: 40px; /* Ajusta horizontalmente el contenido */
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+            
+            /* Flexbox for centering */
+            display: flex;
+            align-items: center; /* Centra verticalmente */
+            justify-content: flex-start; /* Centra horizontalmente */
+        }
+        
+        /* Chargeable SIM's Title */
+        .container2_title h1{
+
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 255px;
+            height: 50px;
+            top: 345px;
+            left: 130px;
+            
+            /*Background*/
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            font-family: "Segoe UI";
+            font-size: 13pt; /* Tamaño del valor aumentado */
+            color: #FFFFFF;
+            font-weight: bold;
+            text-align: left;
+            padding: 0px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        /* Chargeable SIM's Subtitle*/
+        .container2_title h2{
+            
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 255px;
+            height: 50px;
+            top: 370px;
+            left: 130px;
+            
+            /*Background*/
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            font-family: "Segoe UI";
+            font-size: 12pt; /* Tamaño del valor aumentado */
+            color: #808080;
+            font-weight: normal;
+            text-align: left;
+            padding: 0px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+
+        .container2_value {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 100px;
+            height: 50px;
+            top: 360px;
+            left: 385px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 15px 0px 0px 0px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+        
+        .kpi_value_title_2 {
+            font-family: "Segoe UI";
+            font-size: 12px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #FFFFFF;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_value_value_2 {
+            font-family: "Segoe UI";
+            font-size: 18px; /* Tamaño del valor aumentado */
+            color: #808080;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container2_percentage {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 100px;
+            height: 50px;
+            top: 360px;
+            left: 485px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 0px 15px 0px 0px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+        
+        .kpi_percentage_title_2{
+            font-family: "Segoe UI";
+            font-size: 12px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #FFFFFF;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_percentage_value_2 {
+            font-family: "Segoe UI";
+            font-size: 18px; /* Tamaño del valor aumentado */
+            color: #00FF40;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container2 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 455px;
+            height: 200px;
+            top: 410px;
+            left: 130px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px 0px 8px 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+
+        /* Chargeable SIM's Plot Container */
+        .content2 {
+
+            position: relative; /* Relativo al contenedor padre */
+            width: 100%;
+            height: 100%;
+            top: -20px; /* Ajusta verticalmente el contenido */
+            right: 40px; /* Ajusta horizontalmente el contenido */
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+            
+            /* Flexbox for centering */
+            display: flex;
+            align-items: center; /* Centra verticalmente */
+            justify-content: flex-start; /* Centra horizontalmente */
+        }
+        
+        .container3_title {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 360px;
+            height: 50px;
+            top: 30px;
+            left: 620px;
+            
+            /*Background*/
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px 0 5px 0;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            font-family: "Segoe UI";
+            font-size: 9px; /* Tamaño del valor aumentado */
+            color: #FFFFFF;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container3 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 360px;
+            height: 125px;
+            top: 80px;
+            left: 620px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+
+        .content3 {
+
+            position: relative; /* Relativo al contenedor padre */
+            width: 100%;
+            height: 100%;
+            top: -10px; /* Ajusta verticalmente el contenido */
+            right: 42px; /* Ajusta horizontalmente el contenido */
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+
+            /* Flexbox for centering */
+            display: flex;
+            align-items: center; /* Centra verticalmente */
+            justify-content: flex-start; /* Centra horizontalmente */
+        }
+        
+        .container4_title {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 360px;
+            height: 50px;
+            top: 230px;
+            left: 620px;
+            
+            /*Background*/
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            font-family: "Segoe UI";
+            font-size: 9px; /* Tamaño del valor aumentado */
+            color: #FFFFFF;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container4 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 360px;
+            height: 125px;
+            top: 280px;
+            left: 620px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+
+        /* Chargeable SIM's Plot Container */
+        .content4 {
+
+            position: relative; /* Relativo al contenedor padre */
+            width: 100%;
+            height: 100%;
+            top: -10px; /* Ajusta verticalmente el contenido */
+            right: 42px; /* Ajusta horizontalmente el contenido */
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+            
+            /* Flexbox for centering */
+            display: flex;
+            align-items: center; /* Centra verticalmente */
+            justify-content: flex-start; /* Centra horizontalmente */
+        }
+        .container5_title {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 260px;
+            height: 50px;
+            top: 430px;
+            left: 620px;
+            
+            /*Background*/
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            font-family: "Segoe UI";
+            font-size: 9px; /* Tamaño del valor aumentado */
+            color: #FFFFFF;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container5_value {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 100px;
+            height: 50px;
+            top: 430px;
+            left: 880px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 15px 15px 0px 0px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+        
+        .kpi_percentage_title_5 {
+            font-family: "Segoe UI";
+            font-size: 12px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #FFFFFF;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_percentage_value_5 {
+            font-family: "Segoe UI";
+            font-size: 18px; /* Tamaño del valor aumentado */
+            color: #00FF40;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container5 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 360px;
+            height: 125px;
+            top: 480px;
+            left: 620px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px 0px 8px 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+
+        .content5 {
+
+            position: relative; /* Relativo al contenedor padre */
+            width: 100%;
+            height: 100%;
+            top: -10px; /* Ajusta verticalmente el contenido */
+            right: 42px; /* Ajusta horizontalmente el contenido */
+            background-color: rgba(0, 0, 0, 0); /* Fondo del contenedor */
+
+            /* Flexbox for centering */
+            display: flex;
+            align-items: center; /* Centra verticalmente */
+            justify-content: flex-start; /* Centra horizontalmente */
+        }
+
+        .container_logo {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 220px;
+            height: 50px;
+            top: 20px;
+            left: 1010px;
+            
+            /*Background*/
+            background-image: url('/static/Logo3.png'); /* Ruta a tu imagen de fondo */
+            background-size: contain; /* Ajusta la imagen para que cubra todo el fondo */
+            background-position: center; /* Centra la imagen */
+            background-repeat: no-repeat; /* Evita que la imagen se repita */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0); /* Sin sombra */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+        }
+        
+        .container6 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 220px;
+            height: 74.5px;
+            top: 90px;
+            left: 1010px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 7px 7px 12px rgba(0, 0, 0, 255);
+            border: 2px solid rgba(0, 0, 0, 255); /* Borde negro sólido de 1px */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+            
+            /* Transition for smooth effect */
+            transition: border 0.3s, box-shadow 0.3s; /* Transición suave para el borde y la sombra */
+        }
+        
+        /* Hover effect */
+        .container6:hover {
+            border: 1px solid rgba(255, 255, 255, 1); /* Borde blanco sólido de 1px */
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7); /* Sombra difusa blanca */
+        }
+        
+        .kpi_title_6 {
+            font-family: "Segoe UI";
+            font-size: 16px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #02EF9D;
+            padding: 5px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_value_6 {
+            font-family: "Segoe UI";
+            font-size: 38px; /* Tamaño del valor aumentado */
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 10px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        
+        
+        .container7 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 220px;
+            height: 74.5px;
+            top: 169.5px;
+            left: 1010px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 7px 7px 12px rgba(0, 0, 0, 255);
+            border: 2px solid rgba(0, 0, 0, 255); /* Borde negro sólido de 1px */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+            
+            /* Transition for smooth effect */
+            transition: border 0.3s, box-shadow 0.3s; /* Transición suave para el borde y la sombra */
+        }
+        
+        /* Hover effect */
+        .container7:hover {
+            border: 1px solid rgba(255, 255, 255, 1); /* Borde blanco sólido de 1px */
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7); /* Sombra difusa blanca */
+        }
+        
+        .kpi_title_7 {
+            font-family: "Segoe UI";
+            font-size: 16px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #316FBC;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_value_7 {
+            font-family: "Segoe UI";
+            font-size: 38px; /* Tamaño del valor aumentado */
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container8 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 220px;
+            height: 94px;
+            top: 249px;
+            left: 1010px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 7px 7px 12px rgba(0, 0, 0, 255);
+            border: 2px solid rgba(0, 0, 0, 255); /* Borde negro sólido de 1px */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+            
+            /* Transition for smooth effect */
+            transition: border 0.3s, box-shadow 0.3s; /* Transición suave para el borde y la sombra */
+        }
+        
+        /* Hover effect */
+        .container8:hover {
+            border: 1px solid rgba(255, 255, 255, 1); /* Borde blanco sólido de 1px */
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7); /* Sombra difusa blanca */
+        }
+        
+        .kpi_title_8 {
+            font-family: "Segoe UI";
+            font-size: 16px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #5312D4;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_value_8 {
+            font-family: "Segoe UI";
+            font-size: 40px; /* Tamaño del valor aumentado */
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container9 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 220px;
+            height: 94px;
+            top: 348px;
+            left: 1010px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 7px 7px 12px rgba(0, 0, 0, 255);
+            border: 2px solid rgba(0, 0, 0, 255); /* Borde negro sólido de 1px */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+            
+            /* Transition for smooth effect */
+            transition: border 0.3s, box-shadow 0.3s; /* Transición suave para el borde y la sombra */
+        }
+        
+        /* Hover effect */
+        .container9:hover {
+            border: 1px solid rgba(255, 255, 255, 1); /* Borde blanco sólido de 1px */
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7); /* Sombra difusa blanca */
+        }
+        
+        .kpi_title_9 {
+            font-family: "Segoe UI";
+            font-size: 16px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #02EF9D;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_value_9 {
+            font-family: "Segoe UI";
+            font-size: 38px; /* Tamaño del valor aumentado */
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container10 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 220px;
+            height: 74.5px;
+            top: 447px;
+            left: 1010px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 7px 7px 12px rgba(0, 0, 0, 255);
+            border: 2px solid rgba(0, 0, 0, 255); /* Borde negro sólido de 1px */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+            
+            /* Transition for smooth effect */
+            transition: border 0.3s, box-shadow 0.3s; /* Transición suave para el borde y la sombra */
+        }
+        
+        /* Hover effect */
+        .container10:hover {
+            border: 1px solid rgba(255, 255, 255, 1); /* Borde blanco sólido de 1px */
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7); /* Sombra difusa blanca */
+        }
+        
+        .kpi_title_10 {
+            font-family: "Segoe UI";
+            font-size: 16px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #316FBC;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_value_10 {
+            font-family: "Segoe UI";
+            font-size: 38px; /* Tamaño del valor aumentado */
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        .container11 {
+            /*Position*/
+            position: absolute; /* Cambia a absolute para que esté en relación con el body */
+            width: 220px;
+            height: 79.5px;
+            top: 526.5px;
+            left: 1010px;
+            
+            /*Background*/
+            background-color: rgba(7, 10, 24, 255); /* Fondo del contenedor */
+            
+            /*Margins*/
+            padding: 0px;
+            box-shadow: 7px 7px 12px rgba(0, 0, 0, 255);
+            border: 2px solid rgba(0, 0, 0, 255); /* Borde negro sólido de 1px */
+            border-radius: 8px;
+            
+            /*Fonts*/
+            color: white; /* Color del texto en el contenedor */
+            
+            /* Transition for smooth effect */
+            transition: border 0.3s, box-shadow 0.3s; /* Transición suave para el borde y la sombra */
+        }
+        
+        /* Hover effect */
+        .container11:hover {
+            border: 1px solid rgba(255, 255, 255, 1); /* Borde blanco sólido de 1px */
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7); /* Sombra difusa blanca */
+        }
+        
+        .kpi_title_11 {
+            font-family: "Segoe UI";
+            font-size: 16px; /* Tamaño del título ajustado */
+            font-weight: bold;
+            color: #5312D4;
+            padding: 10px 0px 0px 0px; /*arriba derecha inferior izquierdo*/
+            text-align: center;
+            
+        }
+        .kpi_value_11 {
+            font-family: "Segoe UI";
+            font-size: 38px; /* Tamaño del valor aumentado */
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 0px 0px 15px 0px; /*arriba derecha inferior izquierdo*/
+        }
+        
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            color: #e0e0e0; /* Texto blanco */
+            font-weight: bold; /* Texto en negrita */
+            text-align: right; /* Alineado a la derecha */
+            width: 100%; /* Asegura que el texto se alinee correctamente en el contenedor */
+        }
+        
+        #monthRange {
+            padding: 12px;
+            border: 1px solid #444; /* Borde gris oscuro */
+            border-radius: 8px; /* Bordes redondeados */
+            width: 350px; /* Ancho del selector */
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: #333; /* Fondo del input oscuro */
+            color: #e0e0e0; /* Texto claro en el input */
+    </style>
+</head>
+<body>
+
+    <!-- Global Container -->
+    <div class="background_container">
+
+        <!-- Growth Dashboard Title Container -->
+        <div class="container_global_title">
+            <h1>Growth Dashboard</h1>
+        </div>
+
+        <!-- Filter Container -->
+        <div id="container_global_filter" class="container_global_filter">
+        </div>
+        
+        <div id="container_filters_window" class="container_filters_window">
+            <form method="GET" action="/">
+                <label for="monthRange">Select Date:</label>
+                <input type="text" id="monthRange" name="month_range" value="{{ month_range }}">
+            </form>
+        </div>
+        
+        <!-- MRR Plot -->
+        <div class="container1_title">
+            <h1>Monthly Recurrent Revenue</h1>
+            <h2>MRR in Eur</h2>
+        </div>
+        <div class="container1_value">
+            <div class="kpi_value_title_1">{{ "Growth Value" }}</div>
+            <div class="kpi_value_value_1">{{ "146.5M" }}</div>
+        </div>
+        <div class="container1_percentage">
+            <div class="kpi_percentage_title_1">{{ "Growth %" }}</div>
+            <div class="kpi_percentage_value_1">{{ "+0.9%" }}</div>
+        </div>
+        <div id="container1" class="container1">
+            <div id="content1" class="content1">
+                
+            </div>
+        </div>
+                
+        <!-- Chargeble SIM's Plot -->
+        <div class="container2_title">
+        <h1>Chargeable SIM's</h1>
+        <h2>In Units</h2>
+        </div>
+        <div class="container2_value">
+            <div class="kpi_value_title_2">{{ "Growth Value" }}</div>
+            <div class="kpi_value_value_2">{{ "146.5M" }}</div>
+        </div>
+        <div class="container2_percentage">
+            <div class="kpi_percentage_title_2">{{ "Growth %" }}</div>
+            <div class="kpi_percentage_value_2">{{ "+0.9%" }}</div>
+        </div>
+        <div ID="container2" class="container2">
+            <div ID="content2" class="content2">
+                
+            </div>
+        </div>
+        
+        <!-- New Active Customers Plot -->
+        <div class="container3_title">
+            <h1>New Active Customers</h1>
+        </div>
+        <div id="container3" class="container3">
+            <div id="content3" class="content3">
+                
+            </div>
+        </div>
+        
+        <!-- ARPU Plot-->
+        <div class="container4_title">
+            <h1>Average Revenue per User (ARPU)</h1>
+        </div>
+        <div id="container4" class="container4">
+            <div id="content4" class="content4">
+                
+            </div>
+        </div>
+        
+        <!-- Churn SIM's Plot-->
+        <div class="container5_title">
+            <h1>Churn SIM's</h1>
+        </div>
+        <div class="container5_value">
+            <div class="kpi_percentage_title_5">{{ "Growth %" }}</div>
+            <div class="kpi_percentage_value_5">{{ "+0.9%" }}</div>
+        </div>
+        <div id="container5" class="container5">
+            <div id="content5" class="content5">
+                
+            </div>
+        </div>
+        
+        <!-- Moabits Logo -->
+        <div class="container_logo"></div>
+        
+        <!-- Total Churn SIM's KPI -->
+        <div class="container6">
+            <div class="kpi_title_6">{{ "Total Churn SIM's" }}</div>
+            <div class="kpi_value_6">{{ kpi_value['kpi6'] }}</div>
+        </div>
+
+        <!-- Total % Churn SIM's KPI -->
+        <div class="container7">
+            <div class="kpi_title_7">{{ "Total % Churn SIM's" }}</div>
+            <div class="kpi_value_7">{{ kpi_value['kpi7'] }}</div>
+        </div>
+
+        <!-- New Direct Active Customers KPI-->
+        <div class="container8">
+            <div class="kpi_title_8">{{ "New Direct Active Customers" }}</div>
+            <div class="kpi_value_8">{{ kpi_value['kpi8'] }}</div>
+        </div>
+
+        <!-- New Indirect Active Customers KPI -->
+        <div class="container9">
+            <div class="kpi_title_9">{{ "New Indirect Active Customers" }}</div>
+            <div class="kpi_value_9">{{ kpi_value['kpi9'] }}</div>
+        </div>
+
+        <!-- Total MRR Growth KPI -->
+        <div class="container10">
+            <div class="kpi_title_10">{{ "Total MRR Growth" }}</div>
+            <div class="kpi_value_10">{{ kpi_value['kpi10'] }}</div>
+        </div>
+
+        <!-- Average MRR Growth KPI -->
+        <div class="container11">
+            <div class="kpi_title_11">{{ "Average MRR Growth" }}</div>
+            <div class="kpi_value_11">{{ kpi_value['kpi11'] }}</div>
+        </div>
+
+    </div>
+    
+    <script>
+        // Obtener el botón y el div
+        const toggleButton = document.getElementById('container_global_filter');
+        const toggleDiv = document.getElementById('container_filters_window');
+
+        // Inicializar el estado del div
+        let isVisible = false;
+
+        // Agregar un evento de clic al botón
+        toggleButton.addEventListener('click', function() {
+            // Alternar el estado
+            isVisible = !isVisible;
+            
+            // Aplicar el estado al div
+            toggleDiv.style.display = isVisible ? 'block' : 'none';
+        });
+    </script>
+    
+    <script>
+    flatpickr("#monthRange", {
+        mode: "range",
+        dateFormat: "Y-m-d", // Incluye el día en el formato
+        defaultDate: ["{{ start_date }}", "{{ end_date }}"],
+        onChange: function(selectedDates) {
+            if (selectedDates.length === 2) {
+                var startDate = selectedDates[0].toISOString().slice(0, 10); // YYYY-MM-DD
+                var endDate = selectedDates[1].toISOString().slice(0, 10); // YYYY-MM-DD
+                document.getElementById('monthRange').value = startDate + ' to ' + endDate;
+                updateGraph1(startDate, endDate);
+                updateGraph2(startDate, endDate);
+                updateGraph3(startDate, endDate);
+                updateGraph4(startDate, endDate);
+                updateGraph5(startDate, endDate);
+            }
+        }
+    });
+
+    function updateGraph1(startDate, endDate) {
+        var url = `/api/graph_data1?month_range=${encodeURIComponent(startDate + ' to ' + endDate)}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(graphData => {
+                console.log("Graph data:", graphData);
+                var graphDiv = document.getElementById('content1');
+                Plotly.react(graphDiv, graphData.data, graphData.layout);
+            })
+            .catch(error => console.error("Error fetching graph data:", error));
+    }
+    
+    function updateGraph2(startDate, endDate) {
+        var url = `/api/graph_data2?month_range=${encodeURIComponent(startDate + ' to ' + endDate)}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(graphData => {
+                console.log("Graph data:", graphData);
+                var graphDiv = document.getElementById('content2');
+                Plotly.react(graphDiv, graphData.data, graphData.layout);
+            })
+            .catch(error => console.error("Error fetching graph data:", error));
+    }
+    
+    function updateGraph3(startDate, endDate) {
+        var url = `/api/graph_data3?month_range=${encodeURIComponent(startDate + ' to ' + endDate)}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(graphData => {
+                console.log("Graph data:", graphData);
+                var graphDiv = document.getElementById('content3');
+                Plotly.react(graphDiv, graphData.data, graphData.layout);
+            })
+            .catch(error => console.error("Error fetching graph data:", error));
+    }
+    
+    function updateGraph4(startDate, endDate) {
+        var url = `/api/graph_data4?month_range=${encodeURIComponent(startDate + ' to ' + endDate)}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(graphData => {
+                console.log("Graph data:", graphData);
+                var graphDiv = document.getElementById('content4');
+                Plotly.react(graphDiv, graphData.data, graphData.layout);
+            })
+            .catch(error => console.error("Error fetching graph data:", error));
+    }
+    
+    function updateGraph5(startDate, endDate) {
+        var url = `/api/graph_data5?month_range=${encodeURIComponent(startDate + ' to ' + endDate)}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(graphData => {
+                console.log("Graph data:", graphData);
+                var graphDiv = document.getElementById('content5');
+                Plotly.react(graphDiv, graphData.data, graphData.layout);
+            })
+            .catch(error => console.error("Error fetching graph data:", error));
+    }
+    
+    // Cargar el gráfico inicialmente si hay un rango de fechas seleccionado
+    var initialStartDate = "{{ start_date }}";
+    var initialEndDate = "{{ end_date }}";
+    if (initialStartDate && initialEndDate) {
+        updateGraph1(initialStartDate, initialEndDate);
+        updateGraph2(initialStartDate, initialEndDate);
+        updateGraph3(initialStartDate, initialEndDate);
+        updateGraph4(initialStartDate, initialEndDate);
+        updateGraph5(initialStartDate, initialEndDate);
+    }
+
+    </script>
+    
+</body>
+</html>
